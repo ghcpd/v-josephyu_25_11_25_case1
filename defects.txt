@@ -1,0 +1,81 @@
+Defects / Documentation Gaps - FileWatcher Pro v1.2
+
+1) Incorrect option name in README (major)
+- README usage example uses `new FileWatcher("./logs", { recursiveMode: true })`.
+- Implementation uses `options.recursive` not `recursiveMode`.
+  Evidence: The `examples/test_readme_example.js` runner printed:
+    watcher1.recursive: false
+    watcher2.recursive: true
+  (watcher1 used { recursiveMode: true } -> recursive === false)
+  Files: README.md, filewatcher.js
+  Impact: Users following README will think recursive watching is enabled when it is not.
+
+2) Undocumented constructor options (major)
+- `filter` (RegExp) — allows matching filenames; only events for matching filenames are emitted.
+  Evidence: test_advanced.js created `ignored.txt` and `match.LOG` and only events for `match.LOG` were emitted.
+    Console lines: "Wrote ignored file: ./logs/ignored.txt" (no change event)
+                   "Wrote match file: ./logs/match.LOG" -> change / debouncedChange events
+- `logFile` (string path) — when provided, events are appended to this file via _log.
+  Evidence: watch.log was created and contains entries like:
+    [2025-11-25T06:18:03.498Z] Event: rename -> match.LOG
+- `usePolling` (boolean) — present in constructor as `deprecatedOption`, unclear effect; should be documented as deprecated.
+  Evidence: filewatcher.js contains `this.deprecatedOption = options.usePolling || false;` but no functionality is influenced in the rest of the code.
+
+3) Missing API docs for advanced methods/events (major)
+- `debounceEvents(delayMs)` — attaches a handler to `change` and emits `debouncedChange` after inactivity.
+  Evidence: test advanced emitted `debouncedChange:` entries.
+- `waitForFile(filename, timeoutMs)` — asynchronous, resolves when a file exists at targetDir/filename or rejects after timeout.
+  Evidence: In tests waitForFile('match.LOG', 2000) resolved true; using the full path led to Timeout (see test_readme_example output showing "Timeout waiting for logs/testfile_..." because the method expects a filename relative to targetDir).
+- `watchOnce(filename)` — implemented but deprecated. It warns "watchOnce() is deprecated. Use waitForFile() instead." and returns waitForFile(filename).
+  Evidence: test_advanced console printed the deprecation warning and fulfilled the promise for once.txt.
+- `stopped` event emitted on `stop()` — README does not mention it.
+  Evidence: watcher's stop() emits `stopped` event; test output showed "watcher1 stopped".
+
+4) Examples in README omit many features (minor -> major)
+- README shows only `recursiveMode` option and `change` event. It should list and document all constructor options, the other events (debouncedChange, stopped), and the async utilities (waitForFile, debounceEvents, watchOnce).
+
+5) Internal API notes
+- `_log(message)` writes entries to `this.logs` array and to `logFile` if present. README should mention logging behavior when `logFile` is provided (or mark it internal if meant so).
+
+Raw console evidence captured while running examples:
+- From `examples/test_readme_example.js`:
+  watcher1.recursive: false
+  watcher2.recursive: true
+  Wrote file: logs/testfile_1764051461831.txt
+  watcher1 change: { eventType: 'rename', filename: 'testfile_1764051461831.txt' }
+  watcher2 change: { eventType: 'rename', filename: 'testfile_1764051461831.txt' }
+  watcher1 change: { eventType: 'change', filename: 'testfile_1764051461831.txt' }
+  watcher2 change: { eventType: 'change', filename: 'testfile_1764051461831.txt' }
+  debouncedChange: { eventType: 'change', filename: 'testfile_1764051461831.txt' }
+  waitForFile error: Timeout waiting for logs/testfile_1764051461831.txt
+  watcher1 stopped
+
+- From `examples/test_advanced.js`:
+  watcher.filter: /\\.log$/i
+  watcher.logFile: ./watch.log
+  Wrote ignored file: ./logs/ignored.txt
+  Wrote match file: ./logs/match.LOG
+  waitForFile result for match.LOG: true
+  watchOnce() is deprecated. Use waitForFile() instead.
+  change: { eventType: 'rename', filename: 'match.LOG' }
+  change: { eventType: 'change', filename: 'match.LOG' }
+  debouncedChange: { eventType: 'change', filename: 'match.LOG' }
+  watchOnce succeeded for once.txt
+  log file contents:
+    [ISO timestamps] Event: rename -> match.LOG
+    [ISO timestamps] Event: change -> match.LOG
+    [ISO timestamps] All watchers stopped
+
+Summary / recommended actions:
+- Fix README to use `recursive` (not `recursiveMode`) or support both option names.
+- Add documentation for: filter, logFile, usePolling (deprecated), debounceEvents, waitForFile, watchOnce, stopped event, and side-effects of _log/logs.
+- Add working examples that exercise these APIs and demonstrate correct usage patterns (e.g., waitForFile takes a filename relative to the target dir).
+- Provide test scripts and a small run_tests.sh to exercise the examples.
+
+STATUS: Fixes applied
+- Updated `examples/test_readme_example.js` to pass filenames relative to the watch directory to `waitForFile` and to assert results. (Fixed failing example.)
+- Updated `examples/test_advanced.js` ordering and assertions so `watchOnce` test creates the file before awaiting (fixed race-condition).
+- Strengthened tests to use assertions and made `run_tests.sh` propagate failures (no longer masking errors with `|| true`).
+- Updated `README.md` to use `recursive` (matches implementation) and added a short pointer to `corrected_readme.md`.
+
+(End of defects.txt)
