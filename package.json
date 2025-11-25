@@ -1,0 +1,13 @@
+{
+  "name": "filewatcher-pro",
+  "version": "1.2.0",
+  "type": "module",
+  "description": "FileWatcher Pro v1.2 - simple Node.js utility for watching file changes",
+  "main": "filewatcher.js",
+  "scripts": {
+    "test": "node --test test_files/*.test.js"
+  },
+  "keywords": ["file", "watch", "fs.watch", "filewatcher"],
+  "author": "",
+  "license": "MIT"
+}
