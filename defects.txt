@@ -1,0 +1,58 @@
+FileWatcher Pro v1.2 - Defects / Documentation Gaps
+
+1) README example uses an incorrect option name
+   - Issue: README shows `new FileWatcher("./logs", { recursiveMode: true });` but implementation expects `options.recursive` (boolean).
+   - Evidence: `filewatcher.js` line 7: `this.recursive = options.recursive || false;`
+   - Example: Running README example doesn't set recursive mode as intended.
+
+2) README doesn't mention that the target directory must exist before calling `start()`
+   - Issue: `fs.watch` requires an existing path; `start()` throws an ENOENT error if directory doesn't exist.
+   - Evidence: Running the example without creating the directory results in runtime error:
+     Error: ENOENT: no such file or directory, watch '<path>/test_files/logs'
+
+3) Additional APIs not documented
+   - `debounceEvents(delayMs)`
+     - Implementation: `debounceEvents` attaches a handler to the `change` event and emits `debouncedChange` after `delayMs`ms with the last event.
+     - Evidence: In `filewatcher.js`, `debounceEvents(delayMs)` implementation. No README mention.
+
+   - `waitForFile(filename, timeoutMs)`
+     - Implementation: Returns a Promise that resolves if the file is present within `timeoutMs`, otherwise rejects with Timeout.
+     - Evidence: `waitForFile` implemented in `filewatcher.js`.
+
+   - `watchOnce(filename)` (deprecated)
+     - Implementation: `watchOnce` prints deprecation warning and calls `waitForFile()`.
+     - Evidence: `console.warn` usage in `watchOnce`.
+
+   - `filter` option
+     - Implementation: options.filter is applied as a `RegExp` to the `filename` to filter which files are emitted; README shows nothing about this option.
+     - Evidence: `this.filter = options.filter || null;` and `if (this.filter && !filename.match(this.filter)) return;` in `start()`.
+
+   - `logFile` option and `logs` history
+     - Implementation: `logFile` writes log entries synchronously via `_log` which appends to the specified file; `logs` array stores log entries in memory.
+     - Evidence: `_log()` implementation and `this.logs` array.
+
+   - `stopped` event
+     - Implementation: `stop()` emits `this.emit("stopped")`. README doesn't mention it.
+
+   - `change` event payload
+     - Implementation: Emits an object { eventType, filename }. README subscribes with `.on('change', (event) => event.filename)` - that's fine, but the README doesn't mention `eventType` or that multiple `change` events may be emitted for a single file (e.g., `rename` and `change`).
+
+4) README lacks guidance about platform-specific behavior and Node's `fs.watch` semantics
+   - Issue: `fs.watch` has platform-dependent behavior for `eventType` and sometimes sends multiple events; README should mention this.
+   - Evidence: Tests showed both `rename` and `change` event for one action.
+
+5) `options.usePolling` behavior and documentation can be improved
+  - Issue: `usePolling` existed but previously had no effect. Implemented in this work as a polling fallback to improve compatibility with environments where `fs.watch` is unreliable (e.g., Git Bash on Windows). Update README to document this option and its implications.
+  - Evidence: `filewatcher.js` now implements `usePolling` with a directory scan and emits `change`/`rename` events accordingly; tests were updated to enable `usePolling` for consistent behavior.
+
+6) `start()` doesn't check existence and doesn't return a Promise
+   - Issue: `start()` calls `fs.watch` directly; README should indicate that it can throw an exception if directory does not exist.
+   - Suggested fix: Document `start()` requires an existing directory or change implementation to create directory or provide more graceful error.
+
+7) Minor: `_log` writes synchronously causing potential blocking
+   - Issue: `_log()` uses `fs.appendFileSync`, which is blocking; mention this in docs.
+
+8) Example lacks complete code to safely stop the watcher
+   - Issue: README should show `watcher.stop()` and how to handle 'stopped' for cleanup.
+
+End of defects.
