@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+"/mnt/c/Program Files/nodejs/node.exe" "$@"

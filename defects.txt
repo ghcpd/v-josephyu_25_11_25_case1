@@ -1,0 +1,41 @@
+Defects / Missing docs for FileWatcher Pro v1.2
+
+1) Option naming mismatch
+- README shows: { recursiveMode: true }
+- Implementation uses: options.recursive
+- Evidence: `FileWatcher` constructor sets `this.recursive = options.recursive || false` in `filewatcher.js`.
+- Severity: Confusing; README should use `recursive` or both should be accepted.
+
+2) Undocumented options
+- `filter` (RegExp or null): Implementation supports `options.filter` to filter filenames.
+- `logFile` (string or null): Implementation supports `options.logFile` to append logs to a file.
+- `usePolling` (deprecated): Implementation reads `options.usePolling` to `deprecatedOption` but README lacks documentation and deprecation note.
+- Evidence: filewatcher.js lines: `this.filter = options.filter || null;`, `this.logFile = options.logFile || null;`, `this.deprecatedOption = options.usePolling || false;`.
+- Severity: Medium; these are useful and should be documented.
+
+3) Missing / undocumented events
+- Events emitted by FileWatcher include: `change`, `debouncedChange` (from debounceEvents), and `stopped` (on stop()). README only mentions `change`.
+- Evidence: `this.emit('debouncedChange', lastEvent)` inside debounceEvents and `this.emit('stopped')` in `stop()`.
+- Severity: Medium; devs expect these events to be documented.
+
+4) Undocumented methods / behaviors
+- `debounceEvents(delayMs)`: exists in implementation but not in README. It registers a handler and emits `debouncedChange` after the delay.
+- `waitForFile(filename, timeoutMs)`: polls for a file to appear; returns a Promise that resolves or rejects on timeout.
+- `watchOnce(filename)`: marked as deprecated, delegates to `waitForFile` and logs a deprecation warning.
+- `_log(message)`: internal logging helper writing to `this.logs` and optionally to `logFile`.
+- Evidence: See definitions in filewatcher.js.
+- Severity: Medium to Low; should be documented.
+
+5) Example uses wrong option name
+- README example instantiates with `{ recursiveMode: true }`. The example still works in our simple case because recursive isn't required most of the time, but users will be misled when they need recursion.
+- Correct instantiation: `{ recursive: true }` or accept both keys.
+- Severity: Low but misleading.
+
+6) No test harness or examples for new APIs
+- README lacks usage examples for `debounceEvents`, `waitForFile`, `filter`, and log file creation.
+- Evidence: README only shows `start`, not these methods. Implementation supports them.
+- Severity: Medium.
+
+
+Summary:
+- Several features in implementation are not documented: `filter`, `logFile`, `waitForFile`, `debounceEvents`, `watchOnce` (deprecated), and `stopped`/`debouncedChange` events; README incorrectly refers to `recursiveMode` instead of `recursive`.
