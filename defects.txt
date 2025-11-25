@@ -1,0 +1,43 @@
+FileWatcher Pro v1.2 – Documentation Defects
+===========================================
+
+1) Option name mismatch: `recursiveMode` vs `recursive`
+   - Evidence: `filewatcher.js` line ~6: `this.recursive = options.recursive || false;`
+   - README example uses `{ recursiveMode: true }`, which is ignored by the implementation.
+   - Impact: Recursive watching is silently disabled when following README.
+
+2) ES Module usage not documented
+   - Evidence: `filewatcher.js` uses `import fs from "fs"; import EventEmitter from "events";` (ESM syntax).
+   - README omits the requirement for `"type": "module"` in `package.json` or an alternative CommonJS usage.
+   - Impact: Running the README snippet in a default Node (CommonJS) project throws `SyntaxError: Cannot use import statement outside a module`.
+
+3) Undocumented options: `filter`, `logFile`, `usePolling` (deprecated)
+   - Evidence:
+       * `filewatcher.js` line ~7: `this.filter = options.filter || null;`
+       * `filewatcher.js` line ~8: `this.logFile = options.logFile || null;`
+       * `filewatcher.js` line ~9: `this.deprecatedOption = options.usePolling || false;`
+   - Impact: Users cannot leverage filtering or logging features; `usePolling` is a no-op yet not marked deprecated in docs.
+
+4) Undocumented methods/events: `debounceEvents`, `waitForFile`, `watchOnce` (deprecated), `stopped`, `debouncedChange`
+   - Evidence:
+       * `filewatcher.js` lines ~20-32: `debounceEvents(delayMs)` sets up `debouncedChange`
+       * `filewatcher.js` lines ~34-49: `waitForFile(filename, timeoutMs)` returns a Promise
+       * `filewatcher.js` lines ~64-67: `watchOnce` warns deprecated and delegates to `waitForFile`
+       * `filewatcher.js` lines ~18-19: `stop()` emits `stopped`
+   - Impact: Useful async and debounced workflows are invisible to users; deprecation guidance is missing.
+
+5) Event payload shape not documented
+   - Evidence: `start()` emits `change` with `{ eventType, filename }` (line ~14).
+   - Impact: Users may incorrectly assume `fs.watch` signature rather than the wrapped object.
+
+6) `start()` idempotency/behavior not documented
+   - Evidence: `start()` pushes a new watcher each call without closing existing watchers (line ~11-19).
+   - Impact: Multiple calls can leak watchers; docs should warn or define behavior.
+
+7) Log storage side-effect undocumented
+   - Evidence: `this.logs` array collects messages (line ~10, `_log` at ~51-57).
+   - Impact: Users unaware they can inspect in-memory logs or that `logFile` writes synchronously.
+
+8) Platform caveat for `recursive`
+   - Evidence: `fs.watch` `recursive` works only on macOS/Windows; code passes option blindly.
+   - Impact: README doesn't mention that recursive watching may be unsupported on Linux.
