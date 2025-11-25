@@ -1,0 +1,12 @@
+{
+  "name": "filewatcher-pro-tests",
+  "version": "1.2.0",
+  "type": "module",
+  "description": "Test suite for FileWatcher Pro v1.2",
+  "main": "filewatcher.js",
+  "scripts": {
+    "test": "bash run_tests.sh"
+  },
+  "author": "",
+  "license": "MIT"
+}

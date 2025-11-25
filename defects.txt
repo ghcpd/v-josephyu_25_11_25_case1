@@ -1,0 +1,99 @@
+================================================================================
+FILEWATCHER PRO v1.2 - DOCUMENTATION DEFECTS REPORT
+================================================================================
+
+CRITICAL DEFECTS (API Documentation Missing):
+================================================================================
+
+1. INCORRECT OPTION NAME
+   Location: README.md - Constructor options
+   Issue: README documents "recursiveMode" but implementation uses "recursive"
+   Evidence: 
+     - README: options.recursiveMode = true
+     - Code: this.recursive = options.recursive || false
+   Impact: Examples in README will NOT work as written
+   Fix: Change README to use "recursive" instead of "recursiveMode"
+
+2. MISSING API: debounceEvents(delayMs)
+   Location: filewatcher.js line ~39-52
+   Issue: Method exists but completely undocumented
+   Signature: debounceEvents(delayMs = 100)
+   Purpose: Prevents multiple rapid "change" events from firing
+   Evidence: Full implementation exists in code but zero documentation
+   Impact: Users cannot discover this useful feature
+   Fix: Document with example usage
+
+3. MISSING API: waitForFile(filename, timeoutMs)
+   Location: filewatcher.js line ~54-68
+   Issue: Method exists but completely undocumented
+   Signature: async waitForFile(filename, timeoutMs = 5000)
+   Purpose: Wait for a specific file to appear with timeout
+   Evidence: Full implementation exists in code but zero documentation
+   Impact: Users cannot discover this useful async utility
+   Fix: Document with example usage
+
+4. MISSING API: watchOnce(filename)
+   Location: filewatcher.js line ~76-78
+   Issue: Deprecated method exists but undocumented (includes deprecation warning)
+   Signature: watchOnce(filename)
+   Purpose: Deprecated - recommends using waitForFile() instead
+   Evidence: Method prints warning but is not in README
+   Impact: Users may use deprecated method without knowing better alternative exists
+   Fix: Document as deprecated and recommend waitForFile()
+
+5. MISSING EVENT: "stopped"
+   Location: filewatcher.js line ~31
+   Issue: Event emitted but not documented
+   Signature: emit("stopped")
+   Purpose: Fired when stop() method is called
+   Evidence: emit("stopped") called in stop() method but not in API reference
+   Impact: Users cannot listen for stop events as documented feature
+   Fix: Document "stopped" event in API reference
+
+6. MISSING FEATURE: filter option
+   Location: filewatcher.js line ~8
+   Issue: Constructor option exists but completely undocumented
+   Type: RegExp or function to filter filenames
+   Signature: options.filter = null
+   Purpose: Only emit "change" events for matching files
+   Evidence: Line ~15 checks if (this.filter && !filename.match(this.filter)) return
+   Impact: Users cannot selectively watch files
+   Fix: Document with example usage
+
+7. MISSING FEATURE: logFile option
+   Location: filewatcher.js line ~9
+   Issue: Constructor option exists but completely undocumented
+   Type: String (file path)
+   Signature: options.logFile = null
+   Purpose: Write internal logs to file
+   Evidence: Line ~72 fs.appendFileSync(this.logFile, entry + "\n")
+   Impact: Users cannot enable file logging
+   Fix: Document with example usage
+
+8. MISSING FEATURE: Internal logs property
+   Location: filewatcher.js line ~10
+   Issue: Property exists but completely undocumented
+   Type: Array
+   Signature: this.logs = []
+   Purpose: Stores internal log messages in memory
+   Evidence: Line ~71 this.logs.push(entry) - logs collected but not documented
+   Impact: Users cannot access internal logs for debugging
+   Fix: Document property and add getter method
+
+9. DEPRECATED OPTION: usePolling
+   Location: filewatcher.js line ~9
+   Issue: Option exists but marked for deprecation without documentation
+   Signature: options.usePolling = false (deprecated)
+   Purpose: Should enable polling mode (but not actually used in code)
+   Evidence: Line ~9 this.deprecatedOption = options.usePolling || false
+   Impact: Misleading - option is stored but never used
+   Fix: Document as deprecated or remove if not implemented
+
+================================================================================
+SUMMARY:
+- 1 incorrect API name (recursiveMode vs recursive)
+- 8 completely missing API/feature documentations
+- 1 undocumented event
+- 1 deprecated option not documented
+- Total: 9 documentation defects
+================================================================================
