@@ -1,0 +1,180 @@
+josephyu-97: # Task: Tutorial Example Verification
+
+You are provided with a JavaScript library named **FileWatcher Pro v1.2**.
+
+Follow `README.md` to test all tutorial examples.  
+Verify that all examples actually work as described.  
+Identify any **missing or incorrect documentation** for major APIs that exist in the implementation but not in the README.
+
+Then:
+1. Generate `defects.txt` listing all missing or incorrect documentation and evidence.
+2. Generate `corrected_readme.md` with complete documentation and working examples.
+3. setup.sh - Bash file to setup the environment 
+4. test_files - Test files to see if evertthing goes well 
+5. run_tests.sh - Test command to run testcases
+
+GitHub Copilot: I will inspect the workspace and README first to find and run the tutorial examples. Next I'll look for implementation files and tests to verify behavior and locate any missing/incorrect docs.
+
+Created 5 todos
+
+Perfect — I’ll open the README and project files now to locate all tutorial examples and the implementation to test.
+
+Starting: *Scan project files* (1/5)
+
+Proceeding to search the workspace for README and JS source files.
+
+Searched for files matching `**/*`, 3 matches
+
+Read [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/README.md)
+
+Read [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/filewatcher.js)
+
+Nice — I found at least one API mismatch (README uses `recursiveMode` but implementation expects `recursive`) and several undocumented features (`filter`, `logFile`, `debounceEvents`, `waitForFile`, and `watchOnce`). My next step is to run the example to capture behavior and collect evidence for defects.
+
+Starting: *Run examples/tests* (2/5)
+
+Time to create example test scripts and a small runner to exercise the README usage and implementation features.
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/examples/test_readme_example.js)
+
+Executing the example runner to capture behavior and evidence (it will create logs and trigger events).
+
+Ran terminal command: node "d:\mins_project\model_test\Documentation & knowledge\1125\oswe-mini-secondary\examples\test_readme_example.js"
+
+I confirmed the README example runs but the option name mismatch and a few undocumented features cause confusion — next I'll run additional checks for undocumented APIs and collect evidence for defects.
+
+Starting: *Document defects* (3/5)
+
+Creating additional example tests to verify undocumented features: filter, logFile, waitForFile, debounceEvents, and watchOnce.
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/examples/test_advanced.js)
+
+Running the advanced test script to observe filter/logFile/waitForFile/watchOnce behaviors and collect evidence.
+
+Ran terminal command: node "d:\mins_project\model_test\Documentation & knowledge\1125\oswe-mini-secondary\examples\test_advanced.js"
+
+I found these missing/incorrect docs and will write them down with the outputs I captured from running the examples.
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/defects.txt)
+
+All set — I’ve documented the defects. Next I’ll produce a corrected README, then add setup and test runner scripts.
+
+Starting: *Generate corrected README* (4/5)
+
+Now I'll create a corrected README with full API docs and working examples, plus setup and test runner files so users can run the examples easily.
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/corrected_readme.md)
+
+Searched for files matching `**/package.json`, no matches
+
+Proceeding to add setup and test runner scripts plus sample test files so the examples are easy to run.
+
+Starting: *Add setup and test files* (5/5)
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/setup.sh)
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/test_files/sample_files.txt)
+
+Created [](file:///d%3A/mins_project/model_test/Documentation%20%26%20knowledge/1125/oswe-mini-secondary/run_tests.sh)
+
+Nice — the setup and test runner files are in place. Next I’ll run the run_tests.sh runner (via node directly) to confirm it executes and to gather final verification output.
+
+Completed: *Add setup and test files* (5/5)
+
+Next I'll execute the run_tests.sh flow (which invokes the example scripts) to confirm everything executes end-to-end.
+
+Ran terminal command: bash run_tests.sh
+
+Perfect — I ran the repo's examples and verified behavior, found several documentation gaps and a misleading option name, and added tests + docs to make everything reproducible and correctable.
+
+What I discovered: README used the wrong option name (`recursiveMode`) while the implementation expects `recursive`. Several useful features (filter, logFile, debounceEvents, waitForFile, watchOnce, stopped event) are implemented but missing or undocumented in README. Next: I created a formal defects list, a corrected README, setup/test scripts, and runnable examples so you can re-run and verify quickly.
+
+---
+
+## ✅ What I changed / added
+All artifacts were created inside the project root: d:\mins_project\model_test\Documentation & knowledge\1125\oswe-mini-secondary
+
+New / updated files:
+- defects.txt — full list of missing/incorrect documentation + evidence from test runs ✅
+- corrected_readme.md — complete, corrected API documentation with working examples ✅
+- setup.sh — bash helper to prepare local workspace (creates package.json with ESM support + logs dir) ✅
+- run_tests.sh — bash test runner to run examples and print results ✅
+- test_readme_example.js — a runnable script verifying README example behavior ✅
+- test_advanced.js — a runnable script exercising filter/logFile/waitForFile/watchOnce ✅
+- sample_files.txt — small descriptive test-file set ✅
+
+Existing source:
+- filewatcher.js — implementation inspected and referenced when creating docs
+
+---
+
+## 🔎 Main defects found (summary)
+- README used option name `recursiveMode`, but implementation uses `options.recursive`. This leads users to think recursive watching is enabled while it’s not.
+- Missing documentation for implementation features:  
+  - `filter` option (RegExp)  
+  - `logFile` option (string)  
+  - `debounceEvents(delayMs)` (emits `debouncedChange`)  
+  - `waitForFile(filename, timeoutMs)` (Promise; expects filename relative to targetDir)  
+  - `watchOnce(filename)` (deprecated; uses waitForFile)  
+  - `stopped` event emitted on `stop()`  
+- `usePolling` is present in constructor as `deprecatedOption` but not documented — mark deprecated or implement properly.
+- Examples in README omit many of the above and demonstrate a wrong option name.
+
+All details + console evidence are collected in defects.txt.
+
+---
+
+## ▶ How to run the tests (quick)
+You can run the examples directly with `node` or use the helper run_tests.sh. Two ways below:
+
+On a Windows machine using PowerShell (node must be installed):
+- Run the two example scripts directly:
+  ```
+  node .\examples\test_readme_example.js
+  node .\examples\test_advanced.js
+  ```
+- Or run the bash script inside WSL / Git Bash:  
+  In Git Bash:
+  ```
+  bash run_tests.sh
+  ```
+
+On a UNIX-like environment (bash):
+- Prepare environment:
+  ```
+  bash setup.sh
+  ```
+- Run tests:
+  ```
+  bash run_tests.sh
+  ```
+
+The run output will:
+- show `watcher.recursive` behavior (exposes the README mismatch)
+- show logs created when `logFile` is used
+- confirm `filter`, `debouncedChange`, `waitForFile`, and `watchOnce` behaviors
+
+---
+
+## 🔧 Recommendations / next steps
+- Update README (done: see corrected_readme.md) — or replace README.md with corrected content.
+- Consider either:
+  - Accepting both `recursiveMode` and `recursive` as constructor aliases, or
+  - Clearly documenting `recursive` only and removing legacy names.
+- Document `usePolling` clearly or remove if it has no purpose.
+- Add unit tests that verify important APIs (debounce semantics, waitForFile resolution, filter behavior, logFile persistence).
+- Optionally expose a public logging API if writing logs is intended behavior rather than internal.
+
+---
+
+Wrap-up
+- All requested outputs were produced: defects.txt, corrected_readme.md, setup.sh, test_files, and run_tests.sh.
+- I tested examples and captured evidence; everything created is runnable using the commands above.
+
+If you'd like, I can:
+- Replace README.md with the corrected README (I left it unchanged so you can review diffs first), or
+- Implement a tiny API change to accept `recursiveMode` as alias for `recursive` (and add unit tests for it).
+
+Which would you prefer next — automatically update README.md in place, add an alias for `recursiveMode` in the constructor, or generate unit tests?
+
+Made changes.

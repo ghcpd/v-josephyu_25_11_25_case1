@@ -1,0 +1,5 @@
+Sample files to exercise FileWatcher Pro: 
+- logs/sample1.log
+- logs/sample2.txt
+
+Some example files are created by the example scripts in `examples/` (the test runner will write files programmatically).

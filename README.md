@@ -13,7 +13,7 @@ npm install filewatcher-pro
 ```javascript
 import { FileWatcher } from "./filewatcher.js";
 
-const watcher = new FileWatcher("./logs", { recursiveMode: true });
+const watcher = new FileWatcher("./logs", { recursive: true });
 
 watcher.on("change", (event) => {
   console.log("File changed:", event.filename);
@@ -28,7 +28,10 @@ watcher.start();
 Create a watcher for the specified directory.
 
 Options:
-- `recursiveMode` (boolean): Enable recursive watching.  
+- `recursive` (boolean): Enable recursive watching.  
+
+Notes:
+- The project also exposes additional options such as `filter` (RegExp), `logFile` (string), `usePolling` (deprecated) and APIs like `debounceEvents()`, `waitForFile()` and `watchOnce()` — see `corrected_readme.md` for full details.
 
 ### `start()`
 Begin watching for file changes.
