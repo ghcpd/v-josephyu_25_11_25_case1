@@ -1,0 +1,109 @@
+# FileWatcher Pro v1.2 - Documentation Defects Report
+
+## Missing APIs in README Documentation
+
+### 1. FILTER OPTION (Undocumented Feature)
+**Location:** filewatcher.js, line 11
+**Evidence:** 
+  - Constructor accepts `options.filter` parameter
+  - Feature: Allows filtering file events by regex pattern
+  - Implementation: `if (this.filter && !filename.match(this.filter)) return;`
+  - Status: COMPLETELY UNDOCUMENTED in README
+  - Severity: HIGH - Core filtering functionality missing from docs
+
+### 2. LOGFILE OPTION (Undocumented Feature)
+**Location:** filewatcher.js, line 12
+**Evidence:**
+  - Constructor accepts `options.logFile` parameter
+  - Feature: Appends all events to a log file with timestamps
+  - Implementation: `if (this.logFile) fs.appendFileSync(this.logFile, entry + "\n");`
+  - Status: COMPLETELY UNDOCUMENTED in README
+  - Severity: MEDIUM - Logging functionality hidden
+
+### 3. DEPRECATION ISSUE - usePolling Option
+**Location:** filewatcher.js, line 13
+**Evidence:**
+  - `options.usePolling` is accepted but NOT USED in implementation
+  - Constructor stores it: `this.deprecatedOption = options.usePolling || false;`
+  - The actual fs.watch() does NOT use this option
+  - Status: INCORRECTLY NAMED in code; parameter accepted but ignored
+  - Severity: MEDIUM - Misleading to users; option has no effect
+
+### 4. RECURSIVE OPTION NAME MISMATCH
+**Location:** filewatcher.js, line 10 vs README
+**Evidence:**
+  - Constructor accepts `options.recursive` (line 10)
+  - README documents it as `recursiveMode` (line 17 of README)
+  - Implementation: `this.recursive = options.recursive || false;`
+  - Actual implementation uses: `{ recursive: this.recursive }` in fs.watch()
+  - Status: DOCUMENTATION ERROR - Wrong parameter name documented
+  - Severity: HIGH - Code won't work with documented parameter names
+
+### 5. debounceEvents() METHOD (Completely Undocumented)
+**Location:** filewatcher.js, lines 29-41
+**Evidence:**
+  - Public method with signature: `debounceEvents(delayMs = 100)`
+  - Purpose: Prevents multiple rapid events from triggering handlers
+  - Emits custom event: `debouncedChange`
+  - Status: COMPLETELY MISSING from README API Reference
+  - Severity: HIGH - Advanced feature not documented
+
+### 6. waitForFile() METHOD (Completely Undocumented)
+**Location:** filewatcher.js, lines 43-58
+**Evidence:**
+  - Async method with signature: `async waitForFile(filename, timeoutMs = 5000)`
+  - Returns: Promise<boolean> resolves to true if file exists within timeout
+  - Rejects: Error on timeout
+  - Status: COMPLETELY MISSING from README API Reference
+  - Severity: HIGH - Useful async utility not documented
+
+### 7. watchOnce() METHOD (Deprecated, Undocumented)
+**Location:** filewatcher.js, lines 60-63
+**Evidence:**
+  - Public method marked as deprecated in code
+  - Logs warning: "watchOnce() is deprecated. Use waitForFile() instead."
+  - Delegates to waitForFile()
+  - Status: DEPRECATED but neither watchOnce nor deprecation documented
+  - Severity: MEDIUM - Confusing for users; no migration guidance
+
+### 8. "stopped" EVENT (Undocumented)
+**Location:** filewatcher.js, line 27
+**Evidence:**
+  - stop() method emits custom event: `this.emit("stopped");`
+  - No documentation of this event in README
+  - Status: COMPLETELY MISSING from README
+  - Severity: MEDIUM - Event-driven feature not documented
+
+### 9. "debouncedChange" EVENT (Undocumented)
+**Location:** filewatcher.js, line 38
+**Evidence:**
+  - Custom event emitted when debounceEvents() is used
+  - No documentation of this event
+  - Status: COMPLETELY MISSING from README
+  - Severity: MEDIUM - Advanced feature event undocumented
+
+### 10. LOGS PROPERTY (Undocumented)
+**Location:** filewatcher.js, line 16
+**Evidence:**
+  - Instance maintains internal logs array
+  - Populated by _log() calls throughout execution
+  - Status: No public API documented to access logs
+  - Severity: LOW - Internal implementation detail
+
+## TUTORIAL EXAMPLES VERIFICATION
+
+### Example 1: Basic Usage (README)
+```javascript
+const watcher = new FileWatcher("./logs", { recursiveMode: true });
+```
+**Issue:** Parameter name is WRONG
+- Documented as: `recursiveMode`
+- Actual implementation expects: `recursive`
+- **Result: BROKEN** - Feature won't work with documented code
+
+## SUMMARY
+- **Total Defects Found:** 10
+- **Critical Issues:** 3 (incorrect parameter name, missing major APIs)
+- **Missing Documented APIs:** 5 methods/features completely undocumented
+- **Incorrect Documentation:** 1 parameter naming error
+- **Example Code Failures:** 1 tutorial example will not work as written

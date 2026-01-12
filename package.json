@@ -1,0 +1,14 @@
+{
+  "name": "filewatcher-pro-tests",
+  "version": "1.0.0",
+  "description": "Test suite for FileWatcher Pro v1.2",
+  "type": "module",
+  "main": "filewatcher.js",
+  "scripts": {
+    "test": "bash run_tests.sh",
+    "setup": "bash setup.sh"
+  },
+  "keywords": ["filewatcher", "filesystem", "monitoring"],
+  "author": "",
+  "license": "MIT"
+}
